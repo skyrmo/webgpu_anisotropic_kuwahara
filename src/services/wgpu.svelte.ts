@@ -1,8 +1,13 @@
+import shaderModuleCode from "../shaders/render.wgsl?raw";
+
 export class WebGPUService {
+    private canvas: HTMLCanvasElement | null = null;
     private device: GPUDevice | null = null;
     private context: GPUCanvasContext | null = null;
+    private canvasFormat: any = null;
 
     async initialize(canvas: HTMLCanvasElement): Promise<boolean> {
+        this.canvas = canvas;
         if (!navigator.gpu) {
             throw new Error("WebGPU not supported");
         }
@@ -19,38 +24,96 @@ export class WebGPUService {
             throw new Error("Could not get WebGPU context");
         }
 
-        const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+        this.canvasFormat = navigator.gpu.getPreferredCanvasFormat();
         this.context.configure({
             device: this.device,
-            format: canvasFormat,
-            alphaMode: "premultiplied",
+            format: this.canvasFormat,
         });
+
+        console.log("WebGPU Initiated");
 
         return true;
     }
 
-    async processImage(imageData: ImageData): Promise<ImageData> {
-        if (!this.device || !this.context) {
+    async processImage(image: HTMLImageElement) {
+        if (!this.device || !this.context || !this.canvas) {
             throw new Error("WebGPU not initialized");
         }
 
-        // Create buffers for input/output
-        const inputBuffer = this.device.createBuffer({
-            size: imageData.data.byteLength,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        this.canvas.width = image.width;
+        this.canvas.height = image.height;
+
+        const imageBitmap = await createImageBitmap(image);
+
+        const inputTexture = this.device.createTexture({
+            size: [imageBitmap.width, imageBitmap.height],
+            format: "rgba8unorm",
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.COPY_SRC |
+                GPUTextureUsage.RENDER_ATTACHMENT,
         });
 
-        const outputBuffer = this.device.createBuffer({
-            size: imageData.data.byteLength,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+        this.device.queue.copyExternalImageToTexture(
+            { source: imageBitmap },
+            { texture: inputTexture },
+            [imageBitmap.width, imageBitmap.height],
+        );
+
+        // RENDER FUNCTIONS
+        const shaderModule = this.device.createShaderModule({
+            code: shaderModuleCode,
         });
 
-        // Write image data to input buffer
-        this.device.queue.writeBuffer(inputBuffer, 0, imageData.data.buffer);
+        const sampler = this.device.createSampler({
+            magFilter: "nearest",
+            minFilter: "nearest",
+        });
 
-        // Create shader module and pipeline here
-        // ... (shader implementation)
+        const renderPipeline = this.device.createRenderPipeline({
+            layout: "auto",
+            vertex: {
+                module: shaderModule,
+                entryPoint: "vertexMain",
+            },
+            fragment: {
+                module: shaderModule,
+                entryPoint: "fragmentMain",
+                targets: [{ format: this.canvasFormat }],
+            },
+            primitive: {
+                topology: "triangle-list",
+            },
+            multisample: {
+                count: 1,
+            },
+        });
 
-        return imageData; // Replace with actual processed data
+        const renderBindGroup = this.device.createBindGroup({
+            layout: renderPipeline.getBindGroupLayout(0),
+            entries: [
+                { binding: 0, resource: sampler },
+                { binding: 1, resource: inputTexture.createView() },
+            ],
+        });
+
+        let commandEncoder = this.device.createCommandEncoder();
+        const passEncoder = commandEncoder.beginRenderPass({
+            colorAttachments: [
+                {
+                    view: this.context.getCurrentTexture().createView(),
+                    loadOp: "clear",
+                    clearValue: { r: 0, g: 0, b: 0, a: 1.0 },
+                    storeOp: "store",
+                },
+            ],
+        });
+        passEncoder.setPipeline(renderPipeline);
+        passEncoder.setBindGroup(0, renderBindGroup);
+        passEncoder.draw(6);
+        passEncoder.end();
+
+        this.device.queue.submit([commandEncoder.finish()]);
     }
 }
