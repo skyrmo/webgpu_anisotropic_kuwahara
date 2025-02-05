@@ -26,29 +26,47 @@
 </script>
 
 <main>
-    <label>
-        Number of Pixels:
-        <input type="number" bind:value={settings.pixels} min="4" max="16000" />
+    <div class="container">
+        <label>
+            Open Image:
+            <input
+                type="file"
+                accept="image/*"
+                on:change={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) loadImage(file);
+                }}
+            />
+        </label>
+        <label>
+            Number of Pixels:
+            <input
+                type="number"
+                bind:value={settings.pixels}
+                min="4"
+                max="16000"
+            />
+        </label>
         <input type="range" bind:value={settings.pixels} min="4" max="16000" />
-    </label>
 
-    <label>
-        Number of Colours:
-        <input type="number" bind:value={settings.colours} min="2" max="32" />
+        <label>
+            <div class="top-row">
+                Number of Colours:
+                <input
+                    type="number"
+                    bind:value={settings.colours}
+                    min="2"
+                    max="32"
+                />
+            </div>
+        </label>
         <input type="range" bind:value={settings.colours} min="2" max="32" />
-    </label>
-    <label>
-        Open Image:
-        <input
-            type="file"
-            accept="image/*"
-            on:change={(e) => {
-                const file = e.target.files?.[0];
-                if (file) loadImage(file);
-            }}
-        />
-    </label>
+    </div>
 </main>
 
 <style>
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
 </style>
