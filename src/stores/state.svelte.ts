@@ -1,7 +1,20 @@
 type SettingsState = {
-    colours: number;
-    pixels: number;
+    kernelSize: number;
+    n: number;
+    hardness: number;
+    q: number;
+    zeroCrossing: number;
+    zeta: number;
 };
+
+export const settingsState: SettingsState = $state({
+    kernelSize: 9,
+    n: 8,
+    hardness: 8.0,
+    q: 8.0,
+    zeroCrossing: 0.6,
+    zeta: 0.5,
+});
 
 type ImageState = {
     url: string | null;
@@ -9,11 +22,6 @@ type ImageState = {
     width: number;
     height: number;
 };
-
-export const settingsState: SettingsState = $state({
-    colours: 6,
-    pixels: 900,
-});
 
 export const imageState: ImageState = $state({
     url: null,

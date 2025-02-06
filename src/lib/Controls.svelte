@@ -38,29 +38,41 @@
                 }}
             />
         </label>
-        <label>
-            Number of Pixels:
-            <input
-                type="number"
-                bind:value={settings.pixels}
-                min="4"
-                max="16000"
-            />
-        </label>
-        <input type="range" bind:value={settings.pixels} min="4" max="16000" />
 
         <label>
-            <div class="top-row">
-                Number of Colours:
+            <label>
+                Kernel Size:
                 <input
                     type="number"
-                    bind:value={settings.colours}
-                    min="2"
-                    max="32"
+                    bind:value={settings.kernelSize}
+                    min="3"
+                    max="150"
+                    step="2"
                 />
-            </div>
+            </label>
+
+            <label>
+                Hardness:
+                <input
+                    type="range"
+                    bind:value={settings.hardness}
+                    min="1"
+                    max="100"
+                    step="0.5"
+                />
+            </label>
+
+            <label>
+                Quality:
+                <input
+                    type="range"
+                    bind:value={settings.q}
+                    min="1"
+                    max="160"
+                    step="0.5"
+                />
+            </label>
         </label>
-        <input type="range" bind:value={settings.colours} min="2" max="32" />
     </div>
 </main>
 
