@@ -3,6 +3,7 @@ type SettingsState = {
     n: number;
     hardness: number;
     q: number;
+    alpha: number;
     zeroCrossing: number;
     zeta: number;
 };
@@ -12,6 +13,7 @@ export const settingsState: SettingsState = $state({
     n: 8,
     hardness: 8.0,
     q: 8.0,
+    alpha: 1.0,
     zeroCrossing: 0.6,
     zeta: 0.5,
 });

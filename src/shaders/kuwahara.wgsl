@@ -2,19 +2,28 @@ struct VertexOutput {
     @builtin(position) position: vec4f,
     @location(0) texCoord: vec2f,
 }
-
 struct Settings {
-    kernelSize: i32,
-    n: i32,
-    hardness: f32,
-    q: f32,
-    zeroCrossing: f32,
-    zeta: f32,
-}
+// 4-byte aligned integers
+    kernelSize: i32,    // offset 0
+    n: i32,            // offset 4
+    // 4-byte padding to align floats to 8 bytes
+    _pad1: i32,        // offset 8
+    _pad2: i32,        // offset 12
+    // 8-byte aligned floats
+    hardness: f32,     // offset 16
+    q: f32,            // offset 20
+    zeroCrossing: f32, // offset 24
+    zeta: f32,         // offset 28
+    alpha: f32,        // offset 32
+    _pad3: f32,        // offset 36
+    _pad4: f32,        // offset 40
+    _pad5: f32,        // offset 44
+}  // Total size: 48 bytes (aligned to 16 bytes)
 
 @group(0) @binding(0) var textureSampler: sampler;
 @group(0) @binding(1) var inputTexture: texture_2d<f32>;
-@group(0) @binding(2) var<uniform> settings: Settings;
+@group(0) @binding(2) var structureTensorTexture: texture_2d<f32>;
+@group(0) @binding(3) var<uniform> settings: Settings;
 
 @vertex
 fn vertexMain(@builtin(vertex_index) vertexIndex: u32) -> VertexOutput {

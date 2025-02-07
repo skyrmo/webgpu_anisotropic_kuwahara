@@ -1,6 +1,7 @@
 <script lang="ts">
     import { imageState, settingsState } from "../stores/state.svelte";
     import { WebGPUService } from "../services/wgpu.svelte";
+    import { onDestroy } from "svelte";
 
     let canvasWGPU: HTMLCanvasElement;
     const wgpuService = new WebGPUService();
@@ -13,18 +14,22 @@
 
     $effect(() => {
         if (imageState.image) {
-            wgpuService.processImage(imageState.image);
+            wgpuService.initImage(imageState.image);
         }
     });
 
     // Watch for settings changes and trigger re-render
     $effect(() => {
-        if (wgpuService && imageState.image) {
-            // Create a dependency on all settings values
-            const { kernelSize, n, hardness, q, zeroCrossing, zeta } =
-                settingsState;
-            wgpuService.updateSettings();
-        }
+        // if (wgpuService && imageState.image) {
+        // Create a dependency on all settings values. Need to find a better way to do thiss
+        const { kernelSize, hardness, q, alpha, zeroCrossing, zeta } =
+            settingsState;
+        wgpuService.updateSettings();
+        // }
+    });
+
+    onDestroy(() => {
+        wgpuService.destroy();
     });
 </script>
 

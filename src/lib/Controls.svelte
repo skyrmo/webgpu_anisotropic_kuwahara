@@ -1,8 +1,5 @@
 <script lang="ts">
-    import {
-        settingsState as settings,
-        imageState,
-    } from "../stores/state.svelte";
+    import { settingsState, imageState } from "../stores/state.svelte";
 
     async function loadImage(file: File): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -40,38 +37,66 @@
         </label>
 
         <label>
-            <label>
-                Kernel Size:
-                <input
-                    type="number"
-                    bind:value={settings.kernelSize}
-                    min="3"
-                    max="150"
-                    step="2"
-                />
-            </label>
+            Kernel Size:
+            <input
+                type="number"
+                bind:value={settingsState.kernelSize}
+                min="3"
+                max="150"
+                step="2"
+            />
+        </label>
 
-            <label>
-                Hardness:
-                <input
-                    type="range"
-                    bind:value={settings.hardness}
-                    min="1"
-                    max="100"
-                    step="0.5"
-                />
-            </label>
+        <label>
+            Hardness:
+            <input
+                type="number"
+                bind:value={settingsState.hardness}
+                min="1"
+                max="200"
+                step="10"
+            />
+        </label>
 
-            <label>
-                Quality:
-                <input
-                    type="range"
-                    bind:value={settings.q}
-                    min="1"
-                    max="160"
-                    step="0.5"
-                />
-            </label>
+        <label>
+            Quality:
+            <input
+                type="number"
+                bind:value={settingsState.q}
+                min="1"
+                max="160"
+                step="10"
+            />
+        </label>
+        <label>
+            Alpha:
+            <input
+                type="number"
+                bind:value={settingsState.alpha}
+                min="0.1"
+                max="50.1"
+                step="0.5"
+            />
+        </label>
+        <label>
+            Zero-Crossing:
+            <input
+                type="number"
+                bind:value={settingsState.zeroCrossing}
+                min="0.3"
+                max="1"
+                step="0.1"
+            />
+        </label>
+        <label>
+            Zeta:
+            <input
+                type="number"
+                bind:value={settingsState.zeta}
+                min="0.01"
+                max="1"
+                step="0.01"
+            />
         </label>
     </div>
 </main>
