@@ -38,8 +38,14 @@ fn fragmentMain(@location(0) texCoord: vec2f) -> @location(0) vec4f {
     let texSize = vec2f(textureDimensions(inputTexture));
     let texelSize = 1.0 / texSize;
 
-    // Gaussian weights for 5-tap filter
-    let weights = array<f32, 5>(0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+    // Use polynomial weights instead of Gaussian
+    let weights = array<f32, 5>(
+        0.4,    // center
+        0.25,   // offset ±1
+        0.15,   // offset ±2
+        0.10,   // offset ±3
+        0.05    // offset ±4
+    );
 
     var result = textureSample(inputTexture, textureSampler, texCoord) * weights[0];
 

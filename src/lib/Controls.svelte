@@ -64,8 +64,8 @@
                 type="number"
                 bind:value={settingsState.q}
                 min="1"
-                max="160"
-                step="10"
+                max="50"
+                step="1"
             />
         </label>
         <label>
@@ -85,7 +85,7 @@
                 bind:value={settingsState.zeroCrossing}
                 min="0.3"
                 max="1"
-                step="0.1"
+                step="0.01"
             />
         </label>
         <label>
